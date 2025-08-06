@@ -1,5 +1,3 @@
-using System;
-
 namespace ControleReservas.Application.DTOs;
 
 public class ReservaCreateDto
