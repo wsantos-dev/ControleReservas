@@ -1,4 +1,6 @@
+using ControleReservas.Domain.Interfaces;
 using ControleReservas.Infrastructure.Persistence;
+using ControleReservas.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +15,8 @@ builder.Services.AddDbContext<ControleReservasDbContext>(options =>
         builder.Configuration
                 .GetConnectionString("ControleReservasConnection")
     ));
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 var app = builder.Build();
 
