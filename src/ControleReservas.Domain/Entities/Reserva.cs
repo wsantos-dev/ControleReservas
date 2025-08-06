@@ -1,10 +1,11 @@
 using System;
+using ControleReservas.Domain.Enum;
 
 namespace ControleReservas.Domain;
 
 public class Reserva
 {
-    public Guid Id;
+    public Guid Id { get; set; }
 
     public Guid SalaId { get; set; }
 
