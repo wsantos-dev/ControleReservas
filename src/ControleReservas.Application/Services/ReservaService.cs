@@ -24,7 +24,7 @@ public class ReservaService : IReservaService
             Id = r.Id,
             SalaId = r.SalaId,
             UsuarioId = r.UsuarioId,
-            DataHoraReserva = r.DataHoraReserva,
+            DataHoraInicio = r.DataHoraInicio,
             Status = r.Status
 
         });
@@ -40,7 +40,7 @@ public class ReservaService : IReservaService
             Id = reserva.Id,
             SalaId = reserva.SalaId,
             UsuarioId = reserva.UsuarioId,
-            DataHoraReserva = reserva.DataHoraReserva,
+            DataHoraInicio = reserva.DataHoraInicio,
             Status = reserva.Status
 
         };
@@ -48,7 +48,7 @@ public class ReservaService : IReservaService
 
     public async Task CriarAsync(ReservaCreateDto dto)
     {
-        var conflitoReserva = await _unitOfWork.Reservas.ExisteConflitoReserva(dto.SalaId, dto.DateHoraReserva);
+        var conflitoReserva = await _unitOfWork.Reservas.ExisteConflitoReserva(dto.SalaId, dto.DataHoraInicio, dto.DataHoraFim);
 
         if (conflitoReserva)
             throw new ReservaConflitoHorarioException();
@@ -58,7 +58,8 @@ public class ReservaService : IReservaService
             Id = Guid.NewGuid(),
             SalaId = dto.SalaId,
             UsuarioId = dto.UsuarioId,
-            DataHoraReserva = dto.DateHoraReserva,
+            DataHoraInicio = dto.DataHoraInicio,
+            DataHoraFim = dto.DataHoraFim,
             Status = Domain.Enum.ReservaStatus.Confirmada
         };
 
@@ -73,12 +74,13 @@ public class ReservaService : IReservaService
         if (reserva == null)
             throw new ReservaInexistenteException();
 
-        var horasRestantes = (reserva.DataHoraReserva - DateTime.Now).TotalHours;
+        var horasRestantes = (reserva.DataHoraInicio - DateTime.Now).TotalHours;
 
         if (horasRestantes < 24)
             throw new ReservaCancelamentoInvalidoException();
 
         reserva.Status = Domain.Enum.ReservaStatus.Cancelada;
+        reserva.DataCancelamento = DateTime.Now;
 
         _unitOfWork.Reservas.Update(reserva);
         await _unitOfWork.CommitAsync();

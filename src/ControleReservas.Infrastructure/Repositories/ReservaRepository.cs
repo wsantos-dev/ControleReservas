@@ -10,9 +10,10 @@ public class ReservaRepository : Repository<Reserva>, IReservaRepository
 {
     public ReservaRepository(ControleReservasDbContext context) : base(context) {}
 
-    public async Task<bool> ExisteConflitoReserva(Guid salaId, DateTime dataHora)
+    public async Task<bool> ExisteConflitoReserva(Guid salaId, DateTime dataHoraInicio, DateTime dataHoraFim)
         => await _context.Reservas
             .AnyAsync(r => r.SalaId == salaId
-                        && r.DataHoraReserva == dataHora
+                        && dataHoraInicio <  r.DataHoraFim
+                        && dataHoraFim > r.DataHoraFim
                         && r.Status == Domain.Enum.ReservaStatus.Confirmada);
 }
