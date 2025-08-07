@@ -1,6 +1,4 @@
-using System;
 using ControleReservas.Domain;
-using ControleReservas.Domain.Enum;
 using Microsoft.EntityFrameworkCore;
 
 namespace ControleReservas.Infrastructure.Persistence;
@@ -45,6 +43,9 @@ public class ControleReservasDbContext : DbContext
             entity.HasOne(r => r.Usuario)
                   .WithMany(u => u.Reservas)
                   .HasForeignKey(r => r.UsuarioId);
+
+            // Índice para otimizar verificação de conflitos
+            entity.HasIndex(r => new { r.SalaId, r.DataHoraInicio, r.DataHoraFim });
         });
     }
 }

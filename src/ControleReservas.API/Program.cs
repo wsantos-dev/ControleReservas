@@ -29,8 +29,6 @@ builder.Services.AddDbContext<ControleReservasDbContext>(options =>
     ));
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-
 builder.Services.AddScoped<IReservaService, ReservaService>();
 builder.Services.AddScoped<ISalaService, SalaService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
