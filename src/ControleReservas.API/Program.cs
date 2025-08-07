@@ -1,3 +1,5 @@
+using ControleReservas.Application.Interfaces;
+using ControleReservas.Application.Services;
 using ControleReservas.Domain.Interfaces;
 using ControleReservas.Infrastructure.Persistence;
 using ControleReservas.Infrastructure.Repositories;
@@ -17,6 +19,11 @@ builder.Services.AddDbContext<ControleReservasDbContext>(options =>
     ));
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+
+builder.Services.AddScoped<IReservaService, ReservaService>();
+builder.Services.AddScoped<ISalaService, SalaService>();
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 
 var app = builder.Build();
 
