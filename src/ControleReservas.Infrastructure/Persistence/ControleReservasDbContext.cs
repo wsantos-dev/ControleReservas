@@ -1,4 +1,5 @@
 using ControleReservas.Domain;
+using ControleReservas.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ControleReservas.Infrastructure.Persistence;
@@ -14,6 +15,9 @@ public class ControleReservasDbContext : DbContext
     public DbSet<Usuario> Usuarios => Set<Usuario>();
     public DbSet<Reserva> Reservas => Set<Reserva>();
 
+    public DbSet<EmailConfiguration> emailConfigurations => Set<EmailConfiguration>();
+
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -22,19 +26,19 @@ public class ControleReservasDbContext : DbContext
         modelBuilder.Entity<Sala>(entity =>
         {
             entity.ToTable("Salas");
-            entity.HasKey(e => e.Id); 
+            entity.HasKey(e => e.Id);
         });
 
         modelBuilder.Entity<Usuario>(entity =>
         {
             entity.ToTable("Usuarios");
-            entity.HasKey(e => e.Id); 
+            entity.HasKey(e => e.Id);
         });
 
         modelBuilder.Entity<Reserva>(entity =>
         {
             entity.ToTable("Reservas");
-            entity.HasKey(e => e.Id); 
+            entity.HasKey(e => e.Id);
 
             entity.HasOne(r => r.Sala)
                   .WithMany(s => s.Reservas)
@@ -47,5 +51,36 @@ public class ControleReservasDbContext : DbContext
             // Índice para otimizar verificação de conflitos
             entity.HasIndex(r => new { r.SalaId, r.DataHoraInicio, r.DataHoraFim });
         });
+
+        modelBuilder.Entity<EmailConfiguration>(entity =>
+        {
+            entity.ToTable("EmailConfigurations");
+            entity.HasKey(e => e.Id);
+
+
+            entity.Property(e => e.Id)
+                .IsRequired()
+                .HasColumnType("uniqueidentifier");
+
+            entity.Property(e => e.Provider)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.Property(e => e.EncryptedApiKey)
+               .IsRequired();
+
+            entity.Property(e => e.FromEmail)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            entity.Property(e => e.FromName)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            entity.Property(e => e.CreatedAt)
+                .IsRequired()
+                .HasColumnType("datetime2");
+        });
+
     }
 }
