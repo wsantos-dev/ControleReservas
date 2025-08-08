@@ -9,10 +9,21 @@ namespace ControleReservas.Application.Services;
 public class ReservaService : IReservaService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IEmailService _emailService;
 
-    public ReservaService(IUnitOfWork unitOfWork)
+    private readonly ISalaService _salaService;
+
+    private readonly IUsuarioService _usuarioService;
+
+    public ReservaService(IUnitOfWork unitOfWork,
+        IEmailService emailService,
+        ISalaService salaService,
+        IUsuarioService usuarioService)
     {
         _unitOfWork = unitOfWork;
+        _emailService = emailService;
+        _salaService = salaService;
+        _usuarioService = usuarioService;
     }
 
     public async Task<IEnumerable<ReservaDto>> ObterReservasAsync()
@@ -72,6 +83,21 @@ public class ReservaService : IReservaService
         await _unitOfWork.Reservas.AddAsync(novaReserva);
         await _unitOfWork.CommitAsync();
 
+
+        var usuario = _usuarioService.ObterPorIdAsync(novaReserva.UsuarioId).GetAwaiter().GetResult()!;
+        var sala = _salaService.ObterPorIdAsync(novaReserva.SalaId).GetAwaiter().GetResult()!;
+        
+
+        await _emailService.EnviarEmailAsync(
+            usuario.Email,
+            $"Confirmação de Reserva - Sala {sala.Nome}",
+            $@"<p>Prezado usuário {usuario.Nome}</p>
+               <p>Sua reserva para a sala {sala.Nome} foi <b>confirmada!</b></p>
+               <p>Horário de Início: {novaReserva.DataHoraInicio:dd/MM/yyyy HH:mm}</p> 
+               <p>Horário de Término: {novaReserva.DataHoraFim:dd/MM/yyyy HH:mm}</p>
+            "
+        );
+
         return new ReservaDto
         {
             Id = novaReserva.Id,
@@ -98,7 +124,22 @@ public class ReservaService : IReservaService
         reserva.Status = Domain.Enum.ReservaStatus.Cancelada;
         reserva.DataCancelamento = DateTime.Now;
 
+
+        var usuario = _usuarioService.ObterPorIdAsync(reserva.UsuarioId).GetAwaiter().GetResult()!;
+        var sala = _salaService.ObterPorIdAsync(reserva.SalaId).GetAwaiter().GetResult()!;
+
         _unitOfWork.Reservas.Update(reserva);
         await _unitOfWork.CommitAsync();
+        
+         await _emailService.EnviarEmailAsync(
+            usuario.Email,
+            $"Confirmação de Cancelamento de Reserva - Sala {sala.Nome}",
+            $@"<p>Prezado usuário {usuario.Nome}</p>
+               <p>Sua reserva para a sala {sala.Nome} foi <b>cancelada!</b></p>
+               <p>Detalhes do cancelamento:</p>
+               <p>Horário agendado anteriormente: Data de Inicio: {reserva.DataHoraInicio::dd/MM/yyyy HH:mm} | Data de Términio: {reserva.DataHoraFim::dd/MM/yyyy HH:mm}</p>
+               <p>Data do Cancelamento: {reserva.DataCancelamento:dd/MM/yyyy HH:mm}</p>
+            "
+        );
     }
 }

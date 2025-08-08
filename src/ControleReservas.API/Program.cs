@@ -39,10 +39,15 @@ builder.Services.AddDbContext<ControleReservasDbContext>(options =>
                 .GetConnectionString("ControleReservasConnection")
     ));
 
+builder.Services.AddScoped<IConfiguracoesEmailRepository, ConfiguracoesEmailRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 builder.Services.AddScoped<IReservaService, ReservaService>();
 builder.Services.AddScoped<ISalaService, SalaService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+
 
 var app = builder.Build();
 

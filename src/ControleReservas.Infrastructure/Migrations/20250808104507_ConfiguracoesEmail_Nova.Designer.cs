@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ControleReservas.Infrastructure.Migrations
 {
     [DbContext(typeof(ControleReservasDbContext))]
-    [Migration("20250808033007_EmailConfigurations")]
-    partial class EmailConfigurations
+    [Migration("20250808104507_ConfiguracoesEmail_Nova")]
+    partial class ConfiguracoesEmail_Nova
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,37 +25,34 @@ namespace ControleReservas.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("ControleReservas.Domain.Entities.EmailConfiguration", b =>
+            modelBuilder.Entity("ControleReservas.Domain.Entities.ConfiguracoesEmail", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("EncryptedApiKey")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FromEmail")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("FromName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Provider")
+                    b.Property<string>("Chave")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Valor")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
-                    b.ToTable("EmailConfigurations", (string)null);
+                    b.ToTable("ConfiguracoesEmail", (string)null);
                 });
 
             modelBuilder.Entity("ControleReservas.Domain.Reserva", b =>

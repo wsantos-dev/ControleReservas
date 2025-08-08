@@ -3,7 +3,7 @@ using ControleReservas.Domain.Enum;
 
 namespace ControleReservas.Domain;
 
-public class Reserva
+public class  Reserva
 {
     public Guid Id { get; set; }
 

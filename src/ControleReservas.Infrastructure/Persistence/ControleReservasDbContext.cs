@@ -15,10 +15,8 @@ public class ControleReservasDbContext : DbContext
     public DbSet<Usuario> Usuarios => Set<Usuario>();
     public DbSet<Reserva> Reservas => Set<Reserva>();
 
-    public DbSet<EmailConfiguration> emailConfigurations => Set<EmailConfiguration>();
-
-
-
+    public DbSet<ConfiguracoesEmail> ConfiguracoesEmails => Set<ConfiguracoesEmail>();
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -52,35 +50,29 @@ public class ControleReservasDbContext : DbContext
             entity.HasIndex(r => new { r.SalaId, r.DataHoraInicio, r.DataHoraFim });
         });
 
-        modelBuilder.Entity<EmailConfiguration>(entity =>
+        modelBuilder.Entity<ConfiguracoesEmail>(entity =>
         {
-            entity.ToTable("EmailConfigurations");
+            entity.ToTable("ConfiguracoesEmail");
             entity.HasKey(e => e.Id);
-
 
             entity.Property(e => e.Id)
                 .IsRequired()
                 .HasColumnType("uniqueidentifier");
 
-            entity.Property(e => e.Provider)
+            entity.Property(e => e.Nome)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            entity.Property(e => e.Email)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            entity.Property(e => e.Chave)
                 .IsRequired()
                 .HasMaxLength(100);
 
-            entity.Property(e => e.EncryptedApiKey)
+            entity.Property(e => e.Valor)
                .IsRequired();
-
-            entity.Property(e => e.FromEmail)
-                .IsRequired()
-                .HasMaxLength(200);
-
-            entity.Property(e => e.FromName)
-                .IsRequired()
-                .HasMaxLength(200);
-
-            entity.Property(e => e.CreatedAt)
-                .IsRequired()
-                .HasColumnType("datetime2");
         });
-
     }
 }

@@ -11,6 +11,8 @@ public class UnitOfWork : IUnitOfWork
     public ISalaRepository Salas { get; }
     public IUsuarioRepository Usuarios { get; }
     public IReservaRepository Reservas { get; }
+    
+    public IConfiguracoesEmailRepository ConfiguracoesEmail { get; }
 
     public UnitOfWork(ControleReservasDbContext context)
     {
@@ -18,6 +20,7 @@ public class UnitOfWork : IUnitOfWork
         Salas = new SalaRepository(_context);
         Usuarios = new UsuarioRepository(_context);
         Reservas = new ReservaRepository(_context);
+        ConfiguracoesEmail = new ConfiguracoesEmailRepository(_context);
 
     }
 
