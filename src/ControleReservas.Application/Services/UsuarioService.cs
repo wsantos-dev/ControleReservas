@@ -42,10 +42,11 @@ public class UsuarioService : IUsuarioService
             Email = usuario.Email!
         };
     }
-
-       public async Task CriarAsync(UsuarioDto dto)
+    
+    public async Task<UsuarioDto> CriarAsync(UsuarioDto dto)
     {
         var existe = await _unitOfWork.Usuarios.ObterPorEmailAsync(dto.Email);
+
         if (existe != null)
             throw new UsuarioEmailDuplicadoException();
 
@@ -58,8 +59,33 @@ public class UsuarioService : IUsuarioService
 
         await _unitOfWork.Usuarios.AddAsync(novoUsuario);
         await _unitOfWork.CommitAsync();
-    }
-    
-   
 
+        return new UsuarioDto { Id = novoUsuario.Id, Nome = novoUsuario.Nome, Email = novoUsuario.Email };
+    }
+
+    public async Task AtualizarAsync(UsuarioDto usuario)
+    {
+        var usuarioExistente = await _unitOfWork.Usuarios.GetByIdAsync(usuario.Id);
+
+        if (usuarioExistente == null)
+            throw new UsuarioNaoEncontradoException();
+
+        usuarioExistente.Nome = usuario.Nome;
+        usuarioExistente.Email = usuario.Email;
+
+        _unitOfWork.Usuarios.Update(usuarioExistente);
+        await _unitOfWork.CommitAsync();
+    }
+
+    public async Task RemoverAsync(Guid id)
+    {
+        var usuario = await _unitOfWork.Usuarios.GetByIdAsync(id);
+
+        if (usuario == null)
+            throw new UsuarioNaoEncontradoException();
+
+        _unitOfWork.Usuarios.Remove(usuario);
+
+        await _unitOfWork.CommitAsync();
+    }
 }

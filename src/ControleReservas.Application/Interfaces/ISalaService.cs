@@ -6,6 +6,10 @@ public interface ISalaService
 {
     Task<IEnumerable<SalaDto>> ObterSalasAsync();
     Task<SalaDto?> ObterPorIdAsync(Guid id);
-    Task CriarAsync(SalaDto dto);
+    Task<SalaDto> CriarAsync(SalaDto dto);
+    Task AtualizarAsync(SalaDto dto);
+    Task RemoverAsync(Guid id);
+
+
     
 }

@@ -6,7 +6,7 @@ public interface IReservaService
 {
     Task<IEnumerable<ReservaDto>> ObterReservasAsync();
     Task<ReservaDto?> ObterPorIdAsync(Guid id);
-    Task CriarAsync(ReservaCreateDto dto);
+    Task<ReservaDto> CriarAsync(ReservaCreateDto dto);
     Task CancelarAsync(Guid id);
 
 }

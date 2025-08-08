@@ -26,15 +26,44 @@ public class SalasController : ControllerBase
         var sala = await _salaService.ObterPorIdAsync(id);
 
         if (sala == null) return NotFound();
-       
+
         return Ok(sala);
     }
 
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] SalaDto dto)
     {
-        await _salaService.CriarAsync(dto);
-       
-        return CreatedAtAction(nameof(GetById), new { dto.Id }, dto);
+        var salaCriada = await _salaService.CriarAsync(dto);
+
+        return CreatedAtAction(nameof(GetById), new { salaCriada.Id }, salaCriada);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Put([FromRoute] Guid id, [FromBody] SalaDto dto)
+    {
+
+        if (id != dto.Id)
+        {
+            return BadRequest();
+        }
+
+        await _salaService.AtualizarAsync(dto);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete([FromRoute] Guid id)
+    {
+        var usuario = await _salaService.ObterPorIdAsync(id);
+
+        if (usuario == null)
+        {
+            return NotFound();
+        }
+
+        await _salaService.RemoverAsync(usuario.Id);
+
+        return NoContent();
     }
 }

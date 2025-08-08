@@ -20,6 +20,7 @@ public class SalaService : ISalaService
     public async Task<IEnumerable<SalaDto>> ObterSalasAsync()
     {
         var salas = await _unitOfWork.Salas.GetAllAsync();
+
         return salas.Select(s => new SalaDto
         {
             Id = s.Id,
@@ -28,7 +29,7 @@ public class SalaService : ISalaService
         });
     }
 
-  public async Task<SalaDto?> ObterPorIdAsync(Guid id)
+    public async Task<SalaDto?> ObterPorIdAsync(Guid id)
     {
         var sala = await _unitOfWork.Salas.GetByIdAsync(id);
         if (sala == null) return null;
@@ -41,9 +42,10 @@ public class SalaService : ISalaService
         };
     }
 
-    public async Task CriarAsync(SalaDto dto)
+    public async Task<SalaDto> CriarAsync(SalaDto dto)
     {
         var existe = await _unitOfWork.Salas.SalaExisteAsync(dto.Nome);
+
         if (existe)
             throw new SalaNomeDuplicadoException();
 
@@ -56,5 +58,35 @@ public class SalaService : ISalaService
 
         await _unitOfWork.Salas.AddAsync(novaSala);
         await _unitOfWork.CommitAsync();
+
+        return new SalaDto { Id = novaSala.Id, Nome = novaSala.Nome, Capacidade = novaSala.Capacidade };
     }
+
+    public async Task AtualizarAsync(SalaDto dto)
+    {
+        var salaExistente = await _unitOfWork.Salas.GetByIdAsync(dto.Id);
+
+        if (salaExistente == null)
+            throw new SalaNaoEncontradaException();
+
+        salaExistente.Nome = dto.Nome;
+        salaExistente.Capacidade = dto.Capacidade;
+
+        _unitOfWork.Salas.Update(salaExistente);
+
+        await _unitOfWork.CommitAsync();
+    }
+
+    public async Task RemoverAsync(Guid id)
+    {
+        var sala = await _unitOfWork.Salas.GetByIdAsync(id);
+
+        if (sala == null)
+            throw new SalaNaoEncontradaException();
+
+        _unitOfWork.Salas.Remove(sala);
+        
+        await _unitOfWork.CommitAsync();
+    }
+
 }

@@ -22,19 +22,19 @@ public class ControleReservasDbContext : DbContext
         modelBuilder.Entity<Sala>(entity =>
         {
             entity.ToTable("Salas");
-            entity.HasKey(e => e.Id); // Define Id como chave primária
+            entity.HasKey(e => e.Id); 
         });
 
         modelBuilder.Entity<Usuario>(entity =>
         {
             entity.ToTable("Usuarios");
-            entity.HasKey(e => e.Id); // Define Id como chave primária
+            entity.HasKey(e => e.Id); 
         });
 
         modelBuilder.Entity<Reserva>(entity =>
         {
             entity.ToTable("Reservas");
-            entity.HasKey(e => e.Id); // Define Id como chave primária
+            entity.HasKey(e => e.Id); 
 
             entity.HasOne(r => r.Sala)
                   .WithMany(s => s.Reservas)

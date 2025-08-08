@@ -13,7 +13,7 @@ public class ReservaRepository : Repository<Reserva>, IReservaRepository
     public async Task<bool> ExisteConflitoReserva(Guid salaId, DateTime dataHoraInicio, DateTime dataHoraFim)
         => await _context.Reservas
             .AnyAsync(r => r.SalaId == salaId
-                        && dataHoraInicio <  r.DataHoraFim
-                        && dataHoraFim > r.DataHoraFim
+                        && dataHoraInicio <=  r.DataHoraFim
+                        && dataHoraFim >= r.DataHoraFim
                         && r.Status == Domain.Enum.ReservaStatus.Confirmada);
 }

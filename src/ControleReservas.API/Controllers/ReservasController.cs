@@ -20,6 +20,7 @@ namespace ControleReservas.API.Controllers
         public async Task<IActionResult> Get()
             => Ok(await _reservaService.ObterReservasAsync());
 
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -33,9 +34,9 @@ namespace ControleReservas.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] ReservaCreateDto dto)
         {
-            await _reservaService.CriarAsync(dto);
+            var reserva = await _reservaService.CriarAsync(dto);
 
-            return CreatedAtAction(nameof(GetById), new { dto.SalaId }, dto);
+            return CreatedAtAction(nameof(GetById), new { reserva.Id }, reserva);
         }
 
         [HttpPut("{id}/cancelar")]

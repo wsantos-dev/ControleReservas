@@ -25,7 +25,9 @@ public class ReservaService : IReservaService
             SalaId = r.SalaId,
             UsuarioId = r.UsuarioId,
             DataHoraInicio = r.DataHoraInicio,
-            Status = r.Status
+            DataHoraFim = r.DataHoraFim,
+            Status = r.Status,
+            DataCancelamento = r.DataCancelamento
 
         });
     }
@@ -41,13 +43,17 @@ public class ReservaService : IReservaService
             SalaId = reserva.SalaId,
             UsuarioId = reserva.UsuarioId,
             DataHoraInicio = reserva.DataHoraInicio,
-            Status = reserva.Status
-
+            DataHoraFim = reserva.DataHoraFim,
+            Status = reserva.Status,
+            DataCancelamento = reserva.DataCancelamento
         };
     }
 
-    public async Task CriarAsync(ReservaCreateDto dto)
+    public async Task<ReservaDto> CriarAsync(ReservaCreateDto dto)
     {
+        if (dto.DataHoraFim <= dto.DataHoraInicio)
+            throw new ReservaDataInvalidaException();
+
         var conflitoReserva = await _unitOfWork.Reservas.ExisteConflitoReserva(dto.SalaId, dto.DataHoraInicio, dto.DataHoraFim);
 
         if (conflitoReserva)
@@ -65,6 +71,16 @@ public class ReservaService : IReservaService
 
         await _unitOfWork.Reservas.AddAsync(novaReserva);
         await _unitOfWork.CommitAsync();
+
+        return new ReservaDto
+        {
+            Id = novaReserva.Id,
+            SalaId = novaReserva.SalaId,
+            UsuarioId = novaReserva.Id,
+            DataHoraInicio = novaReserva.DataHoraInicio,
+            DataHoraFim = novaReserva.DataHoraFim,
+            Status = novaReserva.Status
+        };
     }
 
     public async Task CancelarAsync(Guid id)
@@ -85,10 +101,4 @@ public class ReservaService : IReservaService
         _unitOfWork.Reservas.Update(reserva);
         await _unitOfWork.CommitAsync();
     }
-
-   
-
-   
-
-    
 }

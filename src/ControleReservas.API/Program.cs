@@ -8,6 +8,17 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("PermitirAcesso", builder =>
+    {
+        builder.AllowAnyOrigin() 
+               .AllowAnyMethod() 
+               .AllowAnyHeader(); 
+    });
+});
+
 // Adiciona serviços ao contêiner.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer(); 
@@ -44,6 +55,8 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Controle de Reservas");
     });
 }
+
+app.UseCors("PermitirAcesso");
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
