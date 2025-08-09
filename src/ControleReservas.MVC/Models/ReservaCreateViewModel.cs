@@ -15,4 +15,12 @@ public class ReservaCreateViewModel
     [Required]
     [Display(Name = "Data de Início")]
     public DateTime DataHoraInicio { get; set; }
+
+    [Required]
+    [Display(Name = "Data Final")]
+    public DateTime DataHoraFim { get; set; }
+
+    [Display(Name = "Data de Cancelamento")]
+    public DateTime? DataCancelamento { get; set; }
+
 }
