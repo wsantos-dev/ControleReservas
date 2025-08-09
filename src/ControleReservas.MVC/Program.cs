@@ -1,4 +1,12 @@
+using ControleReservas.MVC.Services;
+
 var builder = WebApplication.CreateBuilder(args);
+
+
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<ISalaApiService, SalaApiService>();
+builder.Services.AddScoped<IUsuarioApiService, UsuarioApiService>();
+builder.Services.AddScoped<IReservaApiService, ReservaApiService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -22,7 +30,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=Reserva}/{action=Index}/{id?}")
     .WithStaticAssets();
 
 
