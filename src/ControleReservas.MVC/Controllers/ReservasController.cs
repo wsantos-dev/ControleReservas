@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ControleReservas.MVC.Controllers
 {
-    public class ReservaController : Controller
+    public class ReservasController : Controller
     {
         private readonly IReservaApiService _reservaApi;
         private readonly ISalaApiService _salaApi;
         private readonly IUsuarioApiService _usuarioApi;
 
-        public ReservaController(
+        public ReservasController(
             IReservaApiService reservaApiService,
             ISalaApiService salaApiService,
             IUsuarioApiService usuarioApiService)

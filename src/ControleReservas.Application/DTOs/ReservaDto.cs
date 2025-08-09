@@ -1,3 +1,4 @@
+using ControleReservas.Domain;
 using ControleReservas.Domain.Enum;
 
 namespace ControleReservas.Application.DTOs;
@@ -12,5 +13,6 @@ public class ReservaDto
     public ReservaStatus Status { get; set; }
     public DateTime? DataCancelamento { get; set; }
 
-
+    public string UsuarioNome { get; set; } = null!;
+    public string SalaNome { get; set; } = null!;
 }

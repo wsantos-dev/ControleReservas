@@ -1,0 +1,51 @@
+﻿@model IEnumerable<ReservaViewModel>
+@{
+    ViewData["Title"] = "Reservas";
+}
+<h2>Reservas</h2>
+
+@if (TempData["Success"] != null) {
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null) {
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<p>
+    <a class="btn btn-primary" asp-action="Create">Nova Reserva</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Sala</th>
+            <th>Usuário</th>
+            <th>Data Início</th>
+            <th>Data Final</th>
+            <th>Status</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var r in Model)
+    {
+        <tr>
+            <td>@r.SalaNome</td>
+            <td>@r.UsuarioNome</td>
+            <td>@r.DataHoraInicio.ToString("dd/MM/yyyy HH:mm")</td>
+            <td>@r.DataHoraFim.ToString("dd/MM/yyyy HH:mm")</td>
+            <td>@r.Status</td>
+            <td>
+                @if (r.Status != 2)
+                {
+                   <a asp-action="Cancel" asp-route-id="@r.Id" class="btn btn-sm btn-warning">Cancelar</a>
+                }
+                else
+                {
+                    <span>Cancelada</span>        
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

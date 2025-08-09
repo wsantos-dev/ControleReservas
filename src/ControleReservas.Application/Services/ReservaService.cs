@@ -29,6 +29,17 @@ public class ReservaService : IReservaService
     public async Task<IEnumerable<ReservaDto>> ObterReservasAsync()
     {
         var reservas = await _unitOfWork.Reservas.GetAllAsync();
+        var usuarios = await _unitOfWork.Usuarios.GetAllAsync();
+        var salas = await _unitOfWork.Salas.GetAllAsync();
+
+        reservas.Where(r => r.Usuario.Id == r.UsuarioId)
+            .ToList()
+            .ForEach(r =>
+            {
+                r.Usuario = usuarios.FirstOrDefault(u => u.Id == r.UsuarioId)!;
+                r.Sala = salas.FirstOrDefault(s => s.Id == r.SalaId)!;
+            });
+
 
         return reservas.Select(r => new ReservaDto
         {
@@ -38,7 +49,9 @@ public class ReservaService : IReservaService
             DataHoraInicio = r.DataHoraInicio,
             DataHoraFim = r.DataHoraFim,
             Status = r.Status,
-            DataCancelamento = r.DataCancelamento
+            DataCancelamento = r.DataCancelamento,
+            UsuarioNome = r.Usuario.Nome!,
+            SalaNome = r.Sala.Nome!
 
         });
     }

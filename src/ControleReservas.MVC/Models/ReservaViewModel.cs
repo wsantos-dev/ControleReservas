@@ -11,6 +11,6 @@ public class ReservaViewModel
     public string UsuarioNome { get; set; } = string.Empty;
     public DateTime DataHoraInicio { get; set; }
     public DateTime DataHoraFim { get; set; }
-    public string Status { get; set; } = string.Empty;
+    public int Status { get; set; }
     public DateTime? DataCancelamento { get; set; }
 }
