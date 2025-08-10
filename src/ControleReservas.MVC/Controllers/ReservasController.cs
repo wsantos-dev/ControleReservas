@@ -29,6 +29,10 @@ namespace ControleReservas.MVC.Controllers
 
         public async Task<IActionResult> Criar()
         {
+            var dataHoraMinima = DateTime.Now.ToString("yyyy-MM-ddTHH:mm");
+            ViewBag.DataMinima = dataHoraMinima;
+
+
             var salas = await _salaApi.ObterSalasAsync();
             ViewBag.Salas = salas;
 

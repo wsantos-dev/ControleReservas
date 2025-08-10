@@ -2,31 +2,40 @@
 @{
     ViewData["Title"] = "Criar Reserva";
     var salas = ViewBag.Salas as IEnumerable<SalaViewModel> ?? Enumerable.Empty<SalaViewModel>();
+    var usuarios = ViewBag.Usuarios as IEnumerable<UsuarioViewModel> ?? Enumerable.Empty<UsuarioViewModel>();
 }
 <h2>Criar Reserva</h2>
 
-<form asp-action="Create" method="post">
+<form asp-action="Criar" method="post">
     <div class="form-group">
-        <label asp-for="SalaId"></label>
-        <select asp-for="SalaId" class="form-control" asp-items="@(new SelectList(salas, "Id", "Nome"))"></select>
+        <label asp-for="SalaId">Sala</label>
+        <select asp-for="SalaId" class="form-control" asp-items="@(new SelectList(salas, "Id", "Nome"))">
+            <option value="">Selecione</option>
+        </select>
         <span asp-validation-for="SalaId" class="text-danger"></span>
     </div>
-
     <div class="form-group">
-        <label asp-for="UsuarioId"></label>
-        <input asp-for="UsuarioId" class="form-control" /> <!-- idealmente um select com usuários -->
+        <label asp-for="UsuarioId">Usuário</label>
+        <select asp-for="UsuarioId" class="form-control" asp-items="@(new SelectList(usuarios, "Id", "Nome"))">
+            <option value="">Selecione</option>
+        </select>
         <span asp-validation-for="UsuarioId" class="text-danger"></span>
     </div>
 
     <div class="form-group">
         <label asp-for="DataHoraInicio"></label>
-        <input asp-for="DataHoraInicio" class="form-control" type="datetime-local" />
+        <input asp-for="DataHoraInicio" class="form-control" type="datetime-local" min="@ViewBag.DataMinima"
+               oninvalid="this.setCustomValidity('Por favor, selecione uma data e hora igual ou posterior à atual.')"
+               oninput="this.setCustomValidity('')" />
         <span asp-validation-for="DataHoraInicio" class="text-danger"></span>
     </div>
 
-    <div class="form-group"></div>
+    <div class="form-group">
         <label asp-for="DataHoraFim"></label>
-        <input asp-for="DataHoraFim" class="form-control" type="datetime-local" />
+        <input asp-for="DataHoraFim" class="form-control" type="datetime-local"
+               min="@ViewBag.DataMinima"
+               oninvalid="this.setCustomValidity('Por favor, selecione uma data e hora igual ou posterior à atual.')"
+               oninput="this.setCustomValidity('')" />
         <span asp-validation-for="DataHoraInicio" class="text-danger"></span>
     </div>
 
@@ -35,5 +44,7 @@
 </form>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
