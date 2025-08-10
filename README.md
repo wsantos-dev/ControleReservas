@@ -1,1 +1,211 @@
-# Desafio-FSBR
+# Controle de Reservas
+
+## Visão Geral
+
+Este projeto é uma Fullstack desenvolvida com uma WebAPI **ASP.NET Core 9.0** no backend, e **ASP.NET Core MVC** no frontend, projetada para ser escalável, segura e de fácil manutenção. A API implementa operações para criar, editar e cancelar uma Reserva conforme regras de negócio que serão exibidas abaixo.
+
+---
+
+## Tecnologias Utilizadas
+
+- ASP.NET Core 9.0
+- Entity Framework Core (EF Core 9.0)
+- Padrões de Projetos: Repository, Unit of Work
+- Arquitetura Limpa, seguindo princípios DDD (Domínio, Aplicação, Infraestrutura)
+- SendGrid - API para envio de e-mails
+- Injeção de Dependência nativa do ASP.NET Core
+- Banco de Dados: SQL Server
+- Swagger / OpenAPI para documentação
+- XUnit para Testes Unitários.
+---
+
+## Regras de negócio
+
+
+- Uma sala só pode ser reservada se não houver conflitos de horário com outras reservas.
+- Uma reserva só pode ser cancelada com no mínimo 24 horas de antecedência.
+
+## Estrutura do projeto
+
+```
+.
+ControleReservas.sln
+├──src
+    ├── ControleReservas.API
+    │   ├── Connected Services
+    │   ├── Dependencies
+    │   ├── Properties
+    │   ├── Controllers
+    │   ├── appsettings.json
+    │   ├── ControleReservas.API.http
+    │   ├── Program.cs
+    ├── ControleReservas.Application
+    │   ├── Dependencies
+    │   ├── DTOs
+    ├   ├    ├── ReservaCreateDto.cs
+    ├   ├    ├── ReservaDto.cs
+    ├   ├    ├── SalaDto.cs
+    ├   ├    ├── UsuarioDto.cs
+    ├   ├── Interfaces
+    ├   ├    ├── IReservaService.cs
+    ├   ├    ├── ISalaService.cs
+    ├   ├    ├── IUsuarioService.cs
+    ├   ├── Services
+    ├   ├    ├── EmailService.cs
+    ├   ├    ├── ReservaService.cs
+    ├   ├    ├── SalaService.cs
+    ├   ├    ├── UsuarioService.cs
+    ├      
+    └── ControleReservas.Domain
+    ├   ├── Dependencies
+    ├   ├── Entities
+    ├       ├── DTOs
+    ├       ├── ConfiguracoesEmail.cs
+    ├       ├── Reserva.cs
+    ├       ├── Sala.cs
+    ├       ├── Usuario.cs
+    |    ├── Enum
+    ├       ├── ReservaStatus.cs
+    |    ├── Exceptions
+    ├       ├── CancelamentoExpiradoException.cs
+    ├       ├── CapacidadeDaSalaExcedidaException.cs
+    ├       ├── ReservaCancelamentoInvalidoException.cs
+    ├       ├── ReservaConflitoHorarioException.cs
+    ├       ├── ReservaDataInvalidaException.cs
+    ├       ├── ReservaInexistenteException.cs
+    ├       ├── SalaNaoEncontradaException.cs
+    ├       ├── SalaNomeDuplicadoException.cs
+    ├       ├── UsuarioEmailDuplicadoException.cs
+    ├       ├── UsuarioNaoEncontradoException.cs
+    └── Interfaces
+    ├   ├── IConfiguracoesEmailRepository.cs
+    ├   ├── IEmailService.cs
+    ├   ├── IReservaRepository.cs
+    ├   ├── IRespository.cs
+    ├   ├── ISalaRepository.cs
+    ├   ├── IUnitOfWork.cs
+    ├   ├── IUsuarioRepository.cs
+└── ControleReservas.Infrastructure
+    ├── Dependencies
+    ├── Migrations
+    ├   ├── 20250806045437_CriarTabelas.cs
+    ├   ├── 20250807170104_AlteracaoDeProriedadesEntidadeReserva.cs
+    ├   ├── 20250807181605_IncluiIndicesTabelaReservas.cs
+    ├   ├── 20250807182051_PopularBancoDados.cs
+    ├   ├── 20250808104507_ConfiguracoesEmail_Nova.cs
+    ├   ├── ControleReservasDbContextModelSnapshot.cs
+    ├── Persistence
+    ├    ├── ControleReservasDbContext.cs
+    ├    ├── ControleReservasDbContextFactory.cs
+    ├── Repositories
+    ├    ├── ConfiguracoesEmailRepository.cs
+    ├    ├── Repository.cs
+    ├    ├── ReservaRepository.cs
+    ├    ├── SalaRepository.cs
+    ├    ├── UnitOfWork.cs
+    ├    ├── UsuarioRepository.cs
+
+└── ControleReservas.MVC
+├   ├── Connected Services
+├   ├── Dependences
+├   ├── Properties
+├   ├── wwwroot
+├   └── Controllers
+|     ├── HomeController.cs
+|     ├── ReservasController.cs
+|     ├── SalaController.cs
+|     ├── UsuarioController.cs
+|   └── Controllers
+|        ├── ErrorViewModel.cs
+|        ├── ReservaCreateViewModel.cs
+|        ├── ReservaViewModel.cs
+|        ├── SalaViewModel.cs
+|        ├── UsuarioViewModel.cs
+|   └── Services
+|        ├── IReservaApiService.cs
+|        ├── ISalaApiService.cs
+|        ├── IUsuarioApiService.cs
+|        ├── ReservaApiService.cs
+|        ├── SalaApiService.cs
+|        |__ UsuarioApiService.cs
+|   └── Views
+|        ├── Home
+|        ├── Reservas
+|        ├── Shared
+|            ├── _ViewImports
+|            ├── _ViewStart
+|        appsettings.json
+|        Program.cs
+├──tests
+|  ├── ControleReservas.Tests
+|      ├── ReservaServiceTests.cs
+
+
+
+
+```
+
+## Como Executar
+
+### Pré-requisitos
+
+- .NET 9 SDK instalado
+  
+- Banco de dados SQL Server Instalado na máquina local com as seguintes configurações:
+
+- Usuário: desenvolvedor | Senha: DotNet@2025 conforme abaixo:
+- 
+  
+     ```tsql
+        -- Cria o login no servidor
+      CREATE LOGIN [desenvolvedor] WITH PASSWORD = N'DotNet@2025';
+      GO
+      
+      -- Adiciona o login à role 'sysadmin' para conceder permissões totais
+      ALTER SERVER ROLE [sysadmin] ADD MEMBER [desenvolvedor];
+      GO
+     ```
+  
+    
+### Próximos passos
+
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/seu-usuario/seu-repositorio.git
+  ```
+2. Verifique o arquivo appsettings.json do do projeto ControleReservas.API e modifique a string de conexão conforme
+   o seu ambiente:
+
+```json
+  {
+    "ConnectionStrings": {
+      "ControleReservasConnection": "Server=localhost\\SQLEXPRESS;Database=ControleReservas;User   Id=desenvolvedor;Password=DotNet@2025;TrustServerCertificate=True;"
+      },
+}
+```
+
+3. Navege até o diretório:
+   ```
+   cd Desafio-FSBR
+   ```
+3. Execute o comando abaixo:
+   ```bash
+     dotnet build
+   ```
+4. Uma vez compilado com sucesso, navege até o diretório ControleReservas.API e execute o comando:
+```bash
+  dotnet run
+```
+5. Abra outro terminal e navegue até o diretório ControleReservas.MVC e execute o comando:
+```bash
+  dotnet run
+```
+
+6. Para rodar os testes unitários, siga essas instruções:
+
+    No Visual Studio:
+    Vá em Test > Test Explorer.
+
+    O Test Explorer irá exibir todos os testes do seu projeto.
+
+   Você pode clicar em Run All para rodar todos os testes, ou selecionar testes específicos e clicar em Run. A interface é      bem intuitiva e mostra os resultados de forma visual.
