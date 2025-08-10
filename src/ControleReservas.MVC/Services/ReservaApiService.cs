@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Frozen;
 using ControleReservas.MVC.Models;
 
 namespace ControleReservas.MVC.Services;
@@ -47,7 +48,14 @@ public class ReservaApiService : IReservaApiService
     public async Task CancelarAsync(Guid id)
     {
         var response = await _http.PutAsync($"{_baseUrl}/reservas/{id}/cancelar", null);
-        response.EnsureSuccessStatusCode();
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorMessage = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+            var mensagem = errorMessage?["mensagem"];
+
+            throw new ApplicationException(mensagem);
+        }
 
     }
 }

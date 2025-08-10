@@ -58,8 +58,16 @@ public class ReservaService : IReservaService
 
     public async Task<ReservaDto?> ObterPorIdAsync(Guid id)
     {
+        var usuarios = await _unitOfWork.Usuarios.GetAllAsync();
+        var salas = await _unitOfWork.Salas.GetAllAsync();
+
         var reserva = await _unitOfWork.Reservas.GetByIdAsync(id);
+        
         if (reserva == null) return null;
+
+        reserva.Sala = salas.FirstOrDefault(s => s.Id == reserva.SalaId)!;
+        reserva.Usuario = usuarios.FirstOrDefault(u => u.Id == reserva.UsuarioId)!;
+
 
         return new ReservaDto
         {
@@ -69,7 +77,9 @@ public class ReservaService : IReservaService
             DataHoraInicio = reserva.DataHoraInicio,
             DataHoraFim = reserva.DataHoraFim,
             Status = reserva.Status,
-            DataCancelamento = reserva.DataCancelamento
+            DataCancelamento = reserva.DataCancelamento,
+            UsuarioNome = reserva.Usuario.Nome!,
+            SalaNome = reserva.Sala.Nome!
         };
     }
 
@@ -130,6 +140,9 @@ public class ReservaService : IReservaService
             throw new ReservaInexistenteException();
 
         var horasRestantes = (reserva.DataHoraInicio - DateTime.Now).TotalHours;
+
+        if (horasRestantes <= 0)
+            throw new CancelamentoExpiradoException();
 
         if (horasRestantes < 24)
             throw new ReservaCancelamentoInvalidoException();

@@ -96,7 +96,7 @@ namespace ControleReservas.MVC.Controllers
             catch (Exception ex)
             {
                 TempData["Error"] = $"Erro ao cancelar a reserva: {ex.Message}";
-                return RedirectToAction(nameof(Cancelar), new { id = id });
+                return RedirectToAction(nameof(Index));
             }
         }
     }

@@ -1,5 +1,6 @@
 using ControleReservas.Application.DTOs;
 using ControleReservas.Application.Interfaces;
+using ControleReservas.Domain.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,9 +43,23 @@ namespace ControleReservas.API.Controllers
         [HttpPut("{id}/cancelar")]
         public async Task<IActionResult> Cancelar(Guid id)
         {
-            await _reservaService.CancelarAsync(id);
+            try
+            {
+                await _reservaService.CancelarAsync(id);
+                return NoContent();
 
-            return NoContent();
+            }
+            catch (CancelamentoExpiradoException ex)
+            {
+                return BadRequest(new { mensagem = ex.Message });
+            }
+            catch (ReservaCancelamentoInvalidoException ex)
+            {
+
+                return BadRequest(new { mensagem = ex.Message });
+            }
+
+
         }
     }
 }
