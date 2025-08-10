@@ -45,6 +45,22 @@ public class ReservaApiService : IReservaApiService
         response.EnsureSuccessStatusCode();
     }
 
+    public async Task<ReservaViewModel> EditarAsync(Guid id, ReservaViewModel dto)
+    {
+        var response = await _http.PutAsJsonAsync($"{_baseUrl}/reservas/{id}", dto);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorMessage = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+            var mensagem = errorMessage?["message"] ?? "Erro ao editar reserva.";
+
+            throw new ApplicationException(mensagem);
+        }
+
+        var reservaAtualizada = await response.Content.ReadFromJsonAsync<ReservaViewModel>();
+        return reservaAtualizada!;
+    }
+
     public async Task CancelarAsync(Guid id)
     {
         var response = await _http.PutAsync($"{_baseUrl}/reservas/{id}/cancelar", null);

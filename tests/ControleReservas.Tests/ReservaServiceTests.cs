@@ -241,7 +241,7 @@ namespace ControleReservas.Tests
 
           
             _unitOfWorkMock
-                .Setup(u => u.Reservas.Update(It.IsAny<Reserva>()));
+                .Setup(u => u.Reservas.UpdateAsync(It.IsAny<Reserva>()));
 
             _unitOfWorkMock
                 .Setup(u => u.CommitAsync())
@@ -258,7 +258,7 @@ namespace ControleReservas.Tests
           
             Assert.Equal(ReservaStatus.Cancelada, reserva.Status);
 
-            _unitOfWorkMock.Verify(u => u.Reservas.Update(It.Is<Reserva>(
+            _unitOfWorkMock.Verify(u => u.Reservas.UpdateAsync(It.Is<Reserva>(
                 r => r.Id == reserva.Id && r.Status == ReservaStatus.Cancelada
             )), Times.Once);
 

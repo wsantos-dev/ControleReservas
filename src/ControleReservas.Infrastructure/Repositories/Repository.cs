@@ -30,7 +30,7 @@ public class Repository<T> : IRespository<T> where T : class
     public virtual async Task AddAsync(T entity)
         => await _dbSet.AddAsync(entity);
 
-    public virtual void Update(T entity)
+    public virtual void UpdateAsync(T entity)
         => _dbSet.Update(entity);
         
     public virtual void Remove(T entity)

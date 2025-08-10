@@ -72,7 +72,7 @@ public class SalaService : ISalaService
         salaExistente.Nome = dto.Nome;
         salaExistente.Capacidade = dto.Capacidade;
 
-        _unitOfWork.Salas.Update(salaExistente);
+        _unitOfWork.Salas.UpdateAsync(salaExistente);
 
         await _unitOfWork.CommitAsync();
     }

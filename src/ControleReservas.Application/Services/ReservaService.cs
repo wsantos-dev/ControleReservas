@@ -142,6 +142,72 @@ public class ReservaService : IReservaService
         };
     }
 
+
+    public async Task<ReservaDto> EditarAsync(Guid id, ReservaCreateDto dto)
+    {
+        var reserva = await _unitOfWork.Reservas.GetByIdAsync(id);
+        
+        if (reserva == null)
+            throw new ReservaInexistenteException();
+
+        if (reserva.Status == Domain.Enum.ReservaStatus.Cancelada)
+            throw new ReservaCanceladaNaoPodeSerEditadaException();
+
+        var horarioInvalido = dto.DataHoraFim <= dto.DataHoraInicio;
+        if (horarioInvalido)
+            throw new ReservaDataInvalidaException();
+
+        // Verifica se há conflito de horário, ignorando a própria reserva atual
+        var conflitoReserva = await _unitOfWork.Reservas.ExisteConflitoReserva(dto.SalaId, dto.DataHoraInicio, dto.DataHoraFim);
+        if (conflitoReserva)
+            throw new ReservaConflitoHorarioException();
+
+        var usuario = await _usuarioService.ObterPorIdAsync(dto.UsuarioId)
+            ?? throw new UsuarioNaoEncontradoException();
+
+        var sala = await _salaService.ObterPorIdAsync(dto.SalaId)
+            ?? throw new SalaNaoEncontradaException();
+
+        var reservasExistentes = await _unitOfWork.Reservas
+            .GetReservasPorSalaEPeriodoAsync(dto.SalaId, dto.DataHoraInicio, dto.DataHoraFim);
+
+        var reservasSemAtual = reservasExistentes.Where(r => r.Id != id);
+
+        if (reservasSemAtual.Count() >= sala.Capacidade)
+            throw new CapacidadeDaSalaExcedidaException($"Capacidade da sala excedida para o período solicitado. A sala só tem capacidade para {sala.Capacidade} pessoas.");
+
+      
+        reserva.SalaId = dto.SalaId;
+        reserva.UsuarioId = dto.UsuarioId;
+        reserva.DataHoraInicio = dto.DataHoraInicio;
+        reserva.DataHoraFim = dto.DataHoraFim;
+        reserva.Status = Domain.Enum.ReservaStatus.Confirmada;
+
+        _unitOfWork.Reservas.UpdateAsync(reserva);
+        await _unitOfWork.CommitAsync();
+
+        await _emailService.EnviarEmailAsync(
+            usuario.Email,
+            $"Atualização de Reserva - Sala {sala.Nome}",
+            $@"<p>Prezado usuário {usuario.Nome}</p>
+           <p>Sua reserva para a sala {sala.Nome} foi <b>atualizada!</b></p>
+           <p>Horário de Início: {reserva.DataHoraInicio:dd/MM/yyyy HH:mm}</p> 
+           <p>Horário de Término: {reserva.DataHoraFim:dd/MM/yyyy HH:mm}</p>
+        "
+        );
+
+        return new ReservaDto
+        {
+            Id = reserva.Id,
+            SalaId = reserva.SalaId,
+            UsuarioId = reserva.UsuarioId,
+            DataHoraInicio = reserva.DataHoraInicio,
+            DataHoraFim = reserva.DataHoraFim,
+            Status = reserva.Status
+        };
+    }
+
+
     public async Task CancelarAsync(Guid id)
     {
         var reserva = await _unitOfWork.Reservas.GetByIdAsync(id);
@@ -164,7 +230,7 @@ public class ReservaService : IReservaService
         var usuario = _usuarioService.ObterPorIdAsync(reserva.UsuarioId).GetAwaiter().GetResult()!;
         var sala = _salaService.ObterPorIdAsync(reserva.SalaId).GetAwaiter().GetResult()!;
 
-        _unitOfWork.Reservas.Update(reserva);
+        _unitOfWork.Reservas.UpdateAsync(reserva);
         await _unitOfWork.CommitAsync();
         
          await _emailService.EnviarEmailAsync(

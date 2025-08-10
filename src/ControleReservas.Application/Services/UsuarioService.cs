@@ -73,7 +73,7 @@ public class UsuarioService : IUsuarioService
         usuarioExistente.Nome = usuario.Nome;
         usuarioExistente.Email = usuario.Email;
 
-        _unitOfWork.Usuarios.Update(usuarioExistente);
+        _unitOfWork.Usuarios.UpdateAsync(usuarioExistente);
         await _unitOfWork.CommitAsync();
     }
 

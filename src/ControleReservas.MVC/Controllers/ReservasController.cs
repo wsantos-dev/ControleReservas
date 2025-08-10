@@ -70,6 +70,54 @@ namespace ControleReservas.MVC.Controllers
             }
         }
 
+        // GET: Reservas/Editar/{id}
+        public async Task<IActionResult> Editar(Guid id)
+        {
+            var reserva = await _reservaApi.ObterPorIdAsync(id);
+            if (reserva == null)
+                return NotFound();
+
+            var salas = await _salaApi.ObterSalasAsync();
+            ViewBag.Salas = salas;
+
+            var usuarios = await _usuarioApi.ObterUsuariosAsync();
+            ViewBag.Usuarios = usuarios;
+
+            return View(reserva);
+        }
+
+        // POST: Reservas/Editar/{id}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Editar(Guid id, ReservaViewModel vm)
+        {
+            if (id != vm.Id)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Salas = await _salaApi.ObterSalasAsync();
+                ViewBag.Usuarios = await _usuarioApi.ObterUsuariosAsync();
+                return View(vm);
+            }
+
+            try
+            {
+                await _reservaApi.EditarAsync(id, vm);
+                TempData["Success"] = "Reserva editada com sucesso!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                TempData["Error"] = $"Erro ao tentar editar uma reserva: {ex.Message}";
+                ViewBag.Salas = await _salaApi.ObterSalasAsync();
+                ViewBag.Usuarios = await _usuarioApi.ObterUsuariosAsync();
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+
 
         public async Task<IActionResult> Cancelar(Guid id)
         {

@@ -34,16 +34,21 @@
             <td>@r.UsuarioNome</td>
             <td>@r.DataHoraInicio.ToString("dd/MM/yyyy HH:mm")</td>
             <td>@r.DataHoraFim.ToString("dd/MM/yyyy HH:mm")</td>
-            <td>@r.Status</td>
             <td>
                 @if (r.Status != 2)
                 {
-                   <a asp-action="Cancelar" asp-route-id="@r.Id" class="btn btn-sm btn-danger">Cancelar</a>
+                    <span>Confirmada</span>
                 }
                 else
                 {
-                    <span>Cancelada</span>        
+                    <span>Cancelada</span>
                 }
+            </td>
+            <td>
+               <a asp-action="Editar" asp-route-id="@r.Id" class="btn btn-sm btn-warning">Editar</a>
+               <a asp-action="Cancelar" asp-route-id="@r.Id" class="btn btn-sm btn-danger">Cancelar</a>
+                
+               
             </td>
         </tr>
     }
