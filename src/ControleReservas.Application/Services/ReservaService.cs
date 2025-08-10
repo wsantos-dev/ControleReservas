@@ -85,10 +85,11 @@ public class ReservaService : IReservaService
 
     public async Task<ReservaDto> CriarAsync(ReservaCreateDto dto)
     {
-        if (dto.DataHoraFim <= dto.DataHoraInicio)
-            throw new ReservaDataInvalidaException();
-
+        var horario = dto.DataHoraFim <= dto.DataHoraInicio;
         var conflitoReserva = await _unitOfWork.Reservas.ExisteConflitoReserva(dto.SalaId, dto.DataHoraInicio, dto.DataHoraFim);
+        
+        if (horario)
+            throw new ReservaDataInvalidaException();
 
         if (conflitoReserva)
             throw new ReservaConflitoHorarioException();
@@ -103,13 +104,22 @@ public class ReservaService : IReservaService
             Status = Domain.Enum.ReservaStatus.Confirmada
         };
 
+        var usuario = await _usuarioService.ObterPorIdAsync(novaReserva.UsuarioId)
+        ?? throw new UsuarioNaoEncontradoException();
+
+        var sala = await _salaService.ObterPorIdAsync(novaReserva.SalaId)
+            ?? throw new SalaNaoEncontradaException();
+
+        // Obter reservas existentes para a sala no mesmo intervalo
+        var reservasExistentes = await _unitOfWork.Reservas
+            .GetReservasPorSalaEPeriodoAsync(dto.SalaId, dto.DataHoraInicio, dto.DataHoraFim);
+
+        if (reservasExistentes.Count() >= sala.Capacidade)
+            throw new CapacidadeDaSalaExcedidaException($"Capacidade da sala excedida para o período solicitado. A sala só tem capacidade para {sala.Capacidade} pessoas.");
+
+
         await _unitOfWork.Reservas.AddAsync(novaReserva);
         await _unitOfWork.CommitAsync();
-
-
-        var usuario = _usuarioService.ObterPorIdAsync(novaReserva.UsuarioId).GetAwaiter().GetResult()!;
-        var sala = _salaService.ObterPorIdAsync(novaReserva.SalaId).GetAwaiter().GetResult()!;
-        
 
         await _emailService.EnviarEmailAsync(
             usuario.Email,
@@ -163,7 +173,7 @@ public class ReservaService : IReservaService
             $@"<p>Prezado usuário {usuario.Nome}</p>
                <p>Sua reserva para a sala {sala.Nome} foi <b>cancelada!</b></p>
                <p>Detalhes do cancelamento:</p>
-               <p>Horário agendado anteriormente: Data de Inicio: {reserva.DataHoraInicio::dd/MM/yyyy HH:mm} | Data de Términio: {reserva.DataHoraFim::dd/MM/yyyy HH:mm}</p>
+               <p>Horário agendado anteriormente: Data de Inicio: {reserva.DataHoraInicio::dd/MM/yyyy HH:mm} | Data de Términio: {reserva.DataHoraFim:dd/MM/yyyy HH:mm}</p>
                <p>Data do Cancelamento: {reserva.DataCancelamento:dd/MM/yyyy HH:mm}</p>
             "
         );

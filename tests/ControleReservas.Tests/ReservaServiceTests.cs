@@ -20,12 +20,26 @@ namespace ControleReservas.Tests
         private readonly Mock<IUsuarioService> _usuarioServiceMock;
         private readonly ReservaService _reservaService;
 
+        private readonly Mock<IReservaRepository> _reservaRepositoryMock;
+        private readonly Mock<ISalaRepository> _salaRepositoryMock;
+        private readonly Mock<IUsuarioRepository> _usuarioRepositoryMock;
+
+
         public ReservaServiceTests()
         {
             _unitOfWorkMock = new Mock<IUnitOfWork>();
             _emailServiceMock = new Mock<IEmailService>();
             _salaServiceMock = new Mock<ISalaService>();
             _usuarioServiceMock = new Mock<IUsuarioService>();
+
+            _reservaRepositoryMock = new Mock<IReservaRepository>();
+            _salaRepositoryMock = new Mock<ISalaRepository>();
+            _usuarioRepositoryMock = new Mock<IUsuarioRepository>();
+
+            _unitOfWorkMock.Setup(u => u.Reservas).Returns(_reservaRepositoryMock.Object);
+            _unitOfWorkMock.Setup(u => u.Salas).Returns(_salaRepositoryMock.Object);
+            _unitOfWorkMock.Setup(u => u.Usuarios).Returns(_usuarioRepositoryMock.Object);
+
 
             _reservaService = new ReservaService(
                 _unitOfWorkMock.Object,
@@ -36,6 +50,50 @@ namespace ControleReservas.Tests
         }
 
         #region CriarAsync Tests
+
+        [Fact]
+        public async Task CriarAsync_DeveCriarReserva_QuandoCapacidadeNaoFoiAtingida()
+        {
+            // Arrange
+            var dto = new ReservaCreateDto
+            {
+                SalaId = new Guid("b47063e6-7b5d-4095-965b-7fb5b6f4cfe3"), // Sala de Reunião Beta
+                UsuarioId = new Guid("9ca38335-cdb6-4a78-8031-f28136e67b11"), // Wellington Santos
+                DataHoraInicio = DateTime.Now.AddDays(60).AddHours(10),
+                DataHoraFim = DateTime.Now.AddDays(60).AddHours(12)
+            };
+
+            var sala = new Sala { Id = dto.SalaId, Nome = "Sala de Comunicação Digital", Capacidade = 2 };
+            var usuario = new Usuario { Id = dto.UsuarioId, Nome = "Wellington Santos", Email = "wellington.bezerra.santos@outlook.com" };
+            var reservasExistentes = new List<Reserva>
+            {
+                new Reserva { Id = Guid.NewGuid(), SalaId = dto.SalaId }
+            };
+
+            _salaServiceMock.Setup(s => s.ObterPorIdAsync(dto.SalaId))
+                .ReturnsAsync(new SalaDto { Id = sala.Id, Nome = sala.Nome, Capacidade = sala.Capacidade });
+
+            _usuarioServiceMock.Setup(u => u.ObterPorIdAsync(dto.UsuarioId))
+                .ReturnsAsync(new UsuarioDto { Id = usuario.Id, Nome = usuario.Nome, Email = usuario.Email });
+
+       
+            _unitOfWorkMock.Setup(u => u.Reservas.ExisteConflitoReserva(dto.SalaId, dto.DataHoraInicio, dto.DataHoraFim))
+                           .ReturnsAsync(false);
+
+            _reservaRepositoryMock.Setup(r => r.GetReservasPorSalaEPeriodoAsync(dto.SalaId, dto.DataHoraInicio, dto.DataHoraFim))
+                .ReturnsAsync(reservasExistentes);
+
+            _reservaRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Reserva>()))
+                .Returns(Task.CompletedTask);
+
+            _unitOfWorkMock.Setup(u => u.Reservas).Returns(_reservaRepositoryMock.Object);
+
+            var resultado = await _reservaService.CriarAsync(dto);
+
+            Assert.NotNull(resultado);
+            Assert.Equal(dto.SalaId, resultado.SalaId);
+            _reservaRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Reserva>()), Times.Once);
+        }
 
         [Fact]
         public async Task CriarAsync_DeveLancarReservaDataInvalidaException_SeDataFimMenorOuIgualInicio()
@@ -56,8 +114,8 @@ namespace ControleReservas.Tests
         {
             var dto = new ReservaCreateDto
             {
-                SalaId = Guid.NewGuid(),
-                UsuarioId = Guid.NewGuid(),
+                SalaId = new Guid("c9798a11-bfe5-49fd-bff2-28b6ab868609"), // 
+                UsuarioId = new Guid("9ca38335-cdb6-4a78-8031-f28136e67b11"), // Wellington Santos
                 DataHoraInicio = DateTime.Now.AddHours(1),
                 DataHoraFim = DateTime.Now.AddHours(2)
             };
@@ -73,8 +131,8 @@ namespace ControleReservas.Tests
         {
             var dto = new ReservaCreateDto
             {
-                SalaId = Guid.NewGuid(),
-                UsuarioId = Guid.NewGuid(),
+                SalaId = new Guid("b47063e6-7b5d-4095-965b-7fb5b6f4cfe3"),
+                UsuarioId = new Guid("9CA38335-CDB6-4A78-8031-F28136E67B11"),
                 DataHoraInicio = DateTime.Now.AddHours(1),
                 DataHoraFim = DateTime.Now.AddHours(2)
             };
@@ -83,11 +141,11 @@ namespace ControleReservas.Tests
                            .ReturnsAsync(false);
 
             _salaServiceMock.Setup(s => s.ObterPorIdAsync(It.IsAny<Guid>()))
-                        .ReturnsAsync(new SalaDto { Nome = "Sala Teste" });
+                        .ReturnsAsync(new SalaDto { Id = dto.SalaId, Nome = "Sala de Reunião Beta", Capacidade = 5 });
 
 
             _usuarioServiceMock.Setup(u => u.ObterPorIdAsync(dto.UsuarioId))
-                               .ReturnsAsync(new UsuarioDto { Id = dto.UsuarioId, Nome = "Usuário 1", Email = "teste@teste.com" });
+                               .ReturnsAsync(new UsuarioDto { Id = dto.UsuarioId, Nome = "Wellington Santos", Email = "wellington.bezerra.santos@outlook.com" });
 
             await _reservaService.CriarAsync(dto);
 
@@ -140,13 +198,14 @@ namespace ControleReservas.Tests
         }
 
         [Fact]
-        public async Task CancelarAsync_DeveCancelarReserva_SalvarEEnviarEmail_SeValido()
+        public async Task CancelarAsync_DeveCancelarReserva_EnviandoEmail_SeValido()
         {
           
             var sala = new SalaDto
             {
                 Id = new Guid("b47063e6-7b5d-4095-965b-7fb5b6f4cfe3"),
-                Nome = "Sala de Reunião Beta"
+                Nome = "Sala de Reunião Beta",
+                Capacidade = 5
             };
 
             var usuario = new UsuarioDto
