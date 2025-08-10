@@ -172,20 +172,20 @@ ControleReservas.sln
 1. Clone o repositório:
    ```bash
    git clone https://github.com/seu-usuario/seu-repositorio.git
-  ```
+
 2. Verifique o arquivo appsettings.json do do projeto ControleReservas.API e modifique a string de conexão conforme
    o seu ambiente:
 
-```json
-  {
-    "ConnectionStrings": {
-      "ControleReservasConnection": "Server=localhost\\SQLEXPRESS;Database=ControleReservas;User   Id=desenvolvedor;Password=DotNet@2025;TrustServerCertificate=True;"
-      },
+
+{
+  "ConnectionStrings": {
+    "ControleReservasConnection": "Server=localhost\\SQLEXPRESS;Database=ControleReservas;User Id=desenvolvedor;Password=DotNet@2025;TrustServerCertificate=True;"
 }
-```
+}
+
 
 3. Navege até o diretório:
-   ```
+   ```bash
    cd Desafio-FSBR
    ```
 3. Execute o comando abaixo:
@@ -193,13 +193,13 @@ ControleReservas.sln
      dotnet build
    ```
 4. Uma vez compilado com sucesso, navege até o diretório ControleReservas.API e execute o comando:
-```bash
-  dotnet run
-```
+    ```bash
+      dotnet run
+    ```
 5. Abra outro terminal e navegue até o diretório ControleReservas.MVC e execute o comando:
-```bash
-  dotnet run
-```
+    ```bash
+      dotnet run
+    ```
 
 6. Para rodar os testes unitários, siga essas instruções:
 
