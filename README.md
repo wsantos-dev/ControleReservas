@@ -73,8 +73,10 @@ ControleReservas.sln
     ├       ├── ReservaConflitoHorarioException.cs
     ├       ├── ReservaDataInvalidaException.cs
     ├       ├── ReservaInexistenteException.cs
+    |       ├── SalaComReservasExistenteException
     ├       ├── SalaNaoEncontradaException.cs
     ├       ├── SalaNomeDuplicadoException.cs
+    |       ├── UsuarioComReservasExistenteException.cs
     ├       ├── UsuarioEmailDuplicadoException.cs
     ├       ├── UsuarioNaoEncontradoException.cs
     └── Interfaces
@@ -176,32 +178,36 @@ ControleReservas.sln
 2. Verifique o arquivo appsettings.json do do projeto ControleReservas.API e modifique a string de conexão conforme
    o seu ambiente:
 
-
-{
-  "ConnectionStrings": {
+```bash
     "ControleReservasConnection": "Server=localhost\\SQLEXPRESS;Database=ControleReservas;User Id=desenvolvedor;Password=DotNet@2025;TrustServerCertificate=True;"
-}
-}
+```
 
 
 3. Navege até o diretório:
-   ```bash
-   cd Desafio-FSBR
+```bash
+cd Desafio-FSBR
    ```
 3. Execute o comando abaixo:
-   ```bash
-     dotnet build
-   ```
+```bash
+ dotnet build
+```
 4. Uma vez compilado com sucesso, navege até o diretório ControleReservas.API e execute o comando:
-    ```bash
-      dotnet run
-    ```
-5. Abra outro terminal e navegue até o diretório ControleReservas.MVC e execute o comando:
-    ```bash
-      dotnet run
-    ```
-
-6. Para rodar os testes unitários, siga essas instruções:
+```bash
+  dotnet run
+```
+5. Para acessar a API com o Swagger digite em seu navegador:
+```bash
+   http://localhost:5089/swagger/index.html
+```
+6. Abra outro terminal e navegue até o diretório ControleReservas.MVC e execute o comando:
+```bash
+  dotnet run
+```
+7. Para acessar a aplicação digite em seu navegador:
+```bash
+  http://localhost:7149
+```
+8. Para rodar os testes unitários, siga essas instruções:
 
     No Visual Studio:
     Vá em Test > Test Explorer.
