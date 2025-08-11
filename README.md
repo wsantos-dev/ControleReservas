@@ -169,11 +169,9 @@ ControleReservas.sln
      ```
 
 
-- Realize o Download do Backup do Banco de Dados do Projeto
-    ```bash
-      https://drive.google.com/file/d/1EH3o-G3xb6UmWzuQPSYcAXAGbScLZQvv/view?usp=sharing
-    ```
-- Realize a restauração do banco de dados. Você pode encontrar instruções para restauração de um banco de dados SQL Server no link abaixo:
+
+- Realize a restauração do banco de dados **ControleReservas.bak**, incluído na raiz do projeto.
+- Você pode encontrar instruções para restauração de um banco de dados SQL Server no link abaixo:
   ```html
       https://learn.microsoft.com/pt-br/sql/relational-databases/backup-restore/quickstart-backup-restore-database?view=sql-server-ver17&tabs=ssms
   ```
