@@ -1,40 +1,42 @@
-﻿@model ControleReservas.MVC.Models.SalaViewModel
+﻿@model ControleReservas.MVC.Models.UsuarioViewModel
 
 @{
-    ViewData["Title"] = "Editar Sala";
+    ViewData["Title"] = "Criar Usuário";
 }
 
-<h2>Editar Sala</h2>
+<h2>Criar Usuário</h2>
 
-
+<hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Editar">
+        <form asp-action="Criar">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group mb-3">
+            @* <div class="form-group">
                 <label asp-for="Id" class="control-label"></label>
-                <input asp-for="Id" class="form-control" disabled />
+                <input asp-for="Id" class="form-control" />
                 <span asp-validation-for="Id" class="text-danger"></span>
-            </div>
+            </div> *@
             <div class="form-group mb-3">
-                <label asp-for="Nome" class="control-label"></label>
+                <label asp-for="Nome" class="control-label mb-3"></label>
                 <input asp-for="Nome" class="form-control" />
                 <span asp-validation-for="Nome" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
-                <label asp-for="Capacidade" class="control-label"></label>
-                <input asp-for="Capacidade" class="form-control" />
-                <span asp-validation-for="Capacidade" class="text-danger"></span>
+                <label asp-for="Email" class="control-label mb-3"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
             </div>
-            <div class="form-group d-flex justify-content-between">
-                <a asp-action="Index" class="btn btn-primary">Voltar</a>
+            <div class="form-group mb-3 d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-secondary">Voltar</a>
                 <input type="submit" value="Salvar" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
-
+<div>
+    
+</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

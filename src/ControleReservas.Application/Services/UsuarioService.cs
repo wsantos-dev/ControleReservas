@@ -26,7 +26,7 @@ public class UsuarioService : IUsuarioService
             Id = u.Id,
             Nome = u.Nome!,
             Email = u.Email!
-        });
+        }).OrderByDescending(u => u.Nome);
     }
 
     public async Task<UsuarioDto?> ObterPorIdAsync(Guid id)

@@ -1,0 +1,37 @@
+﻿@model ControleReservas.MVC.Models.UsuarioViewModel
+
+@{
+    ViewData["Title"] = "Deletar Usuário";
+}
+
+<h2>Deletar </h2>
+
+<p>Você realmente deseja deletar este usuário?</p>
+<div>
+    
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Nome)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Nome)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+    </dl>
+    
+    <form asp-action="Remover" class="d-flex justify-content-between">
+        <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+        <input type="submit" value="Deletar" class="btn btn-danger" /> |
+    </form>
+</div>

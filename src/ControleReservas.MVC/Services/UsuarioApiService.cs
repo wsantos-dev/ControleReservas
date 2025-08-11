@@ -31,7 +31,7 @@ public class UsuarioApiService : IUsuarioApiService
 
     public async Task CriarAsync(UsuarioViewModel vm)
     {
-        var response = await _http.PutAsJsonAsync($"{_baseUrl}/usuarios", vm);
+        var response = await _http.PostAsJsonAsync($"{_baseUrl}/usuarios", vm);
 
         response.EnsureSuccessStatusCode();
     }
@@ -46,7 +46,14 @@ public class UsuarioApiService : IUsuarioApiService
     public async Task RemoverAsync(Guid id)
     {
         var response = await _http.DeleteAsync($"{_baseUrl}/usuarios/{id}");
-        response.EnsureSuccessStatusCode();
+        
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorMessage = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+            var mensagem = errorMessage?["message"] ?? $"Erro ao deletar usuário: ";
+
+            throw new ApplicationException(mensagem);
+        }
     }    
 
 }

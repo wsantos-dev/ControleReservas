@@ -32,14 +32,24 @@ public class ReservaService : IReservaService
         var usuarios = await _unitOfWork.Usuarios.GetAllAsync();
         var salas = await _unitOfWork.Salas.GetAllAsync();
 
-        reservas.Where(r => r.Usuario.Id == r.UsuarioId)
+        //reservas.Where(r => r.Usuario.Id == r.UsuarioId)
+        //    .ToList()
+        //    .ForEach(r =>
+        //    {
+        //        r.Usuario = usuarios.FirstOrDefault(u => u.Id == r.UsuarioId)!;
+        //        r.Sala = salas.FirstOrDefault(s => s.Id == r.SalaId)!;
+        //    });
+
+        reservas
+            .Where(r => r.Usuario.Id == r.UsuarioId)
+            .OrderByDescending(r => r.DataHoraInicio)
+            .OrderByDescending(r => r.DataHoraFim)
             .ToList()
             .ForEach(r =>
             {
                 r.Usuario = usuarios.FirstOrDefault(u => u.Id == r.UsuarioId)!;
                 r.Sala = salas.FirstOrDefault(s => s.Id == r.SalaId)!;
             });
-
 
         return reservas.Select(r => new ReservaDto
         {

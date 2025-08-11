@@ -1,3 +1,4 @@
+using ControleReservas.Domain.Exceptions;
 using ControleReservas.MVC.Models;
 using ControleReservas.MVC.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -79,7 +80,7 @@ namespace ControleReservas.MVC.Controllers
             try
             {
                 await _usuarioApi.AtualizarAsync(vm);
-                TempData["Success"] = "usuario atualizada com sucesso!";
+                TempData["Success"] = "Usuario editado com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -98,6 +99,39 @@ namespace ControleReservas.MVC.Controllers
                 return NotFound();
             }
             return View(usuario);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Remover(Guid id, SalaViewModel vm)
+        {
+            if (id != vm.Id)
+            {
+                return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(vm);
+            }
+            try
+            {
+
+                await _usuarioApi.RemoverAsync(vm.Id);
+                TempData["Success"] = "Usuário deletado com sucesso!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (SalaComReservaExistenteException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                TempData["Error"] = $"Erro ao tentar deletar o usuário: {ex.Message}";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Ocorreu um erro ao tentar deletar o usuário. {ex.Message}";
+                return RedirectToAction(nameof(Index));
+            }
         }
     }
 }

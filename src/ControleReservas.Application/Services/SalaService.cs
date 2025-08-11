@@ -26,7 +26,7 @@ public class SalaService : ISalaService
             Id = s.Id,
             Nome = s.Nome!,
             Capacidade = s.Capacidade
-        });
+        }).OrderByDescending(s => s.Nome);
     }
 
     public async Task<SalaDto?> ObterPorIdAsync(Guid id)

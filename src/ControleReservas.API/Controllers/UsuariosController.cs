@@ -1,6 +1,8 @@
 using ControleReservas.Application.DTOs;
 using ControleReservas.Application.Interfaces;
+using ControleReservas.Application.Services;
 using ControleReservas.Domain;
+using ControleReservas.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ControleReservas.API.Controllers;
@@ -10,10 +12,12 @@ namespace ControleReservas.API.Controllers;
 public class UsuariosController : ControllerBase
 {
     private readonly IUsuarioService _usuarioService;
+    private readonly IReservaService _reservaService;
 
-    public UsuariosController(IUsuarioService usuarioService)
+    public UsuariosController(IUsuarioService usuarioService, IReservaService reservaService)
     {
         _usuarioService = usuarioService;
+        _reservaService = reservaService;
     }
 
     [HttpGet]
@@ -56,15 +60,31 @@ public class UsuariosController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
-        var usuario = await _usuarioService.ObterPorIdAsync(id);
 
-        if (usuario == null)
+        try
         {
-            return NotFound();
+            var usuario = await _usuarioService.ObterPorIdAsync(id);
+            var reserva = await _reservaService.ObterReservasAsync();
+
+            var existeAlgumaReserva = reserva.Any(r => r.UsuarioId == usuario?.Id);
+            var quantidadeReservas = reserva.Count();
+
+            if (existeAlgumaReserva)
+            {
+                throw new UsuarioComReservasExistenteException(quantidadeReservas);
+            }
+            if (usuario == null)
+            {
+                return NotFound();
+            }
+
+            await _usuarioService.RemoverAsync(usuario.Id);
+
+            return NoContent();
         }
-
-        await _usuarioService.RemoverAsync(usuario.Id);
-
-        return NoContent();
+        catch (UsuarioComReservasExistenteException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 }
