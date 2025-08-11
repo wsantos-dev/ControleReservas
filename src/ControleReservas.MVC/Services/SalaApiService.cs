@@ -1,4 +1,5 @@
 using System;
+using ControleReservas.Application.DTOs;
 using ControleReservas.MVC.Models;
 
 namespace ControleReservas.MVC.Services;
@@ -24,14 +25,15 @@ public class SalaApiService : ISalaApiService
 
     public async Task<SalaViewModel?> ObterPorIdAsync(Guid id)
     {
-        var response = await _http.GetFromJsonAsync<SalaViewModel>($"{_baseUrl}/sala/{id}");
+        var response = await _http.GetFromJsonAsync<SalaViewModel>($"{_baseUrl}/salas/{id}");
 
         return response;
     }
 
     public async Task CriarAsync(SalaViewModel vm)
     {
-        var response = await _http.PutAsJsonAsync($"{_baseUrl}/salas", vm);
+      
+        var response = await _http.PostAsJsonAsync($"{_baseUrl}/salas", vm);
 
         response.EnsureSuccessStatusCode();
     }
@@ -46,6 +48,13 @@ public class SalaApiService : ISalaApiService
     public async Task RemoverAsync(Guid id)
     {
         var response = await _http.DeleteAsync($"{_baseUrl}/salas/{id}");
-        response.EnsureSuccessStatusCode();
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorMessage = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+            var mensagem = errorMessage?["message"] ?? $"Erro ao deletar sala: ";
+
+            throw new ApplicationException(mensagem);
+        }
     }
 }

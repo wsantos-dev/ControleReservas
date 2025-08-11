@@ -1,14 +1,15 @@
+using ControleReservas.Domain.Exceptions;
 using ControleReservas.MVC.Models;
 using ControleReservas.MVC.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ControleReservas.MVC.Controllers
 {
-    public class SalaController : Controller
+    public class SalasController : Controller
     {
         private readonly ISalaApiService _salaApi;
 
-        public SalaController(ISalaApiService salaApiService)
+        public SalasController(ISalaApiService salaApiService)
         {
             _salaApi = salaApiService;
         }
@@ -98,6 +99,39 @@ namespace ControleReservas.MVC.Controllers
                 return NotFound();
             }
             return View(sala);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Remover(Guid id, SalaViewModel vm)
+        {
+            if (id != vm.Id)
+            {
+                return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(vm);
+            }
+            try
+            {
+                
+                await _salaApi.RemoverAsync(vm.Id);
+                TempData["Success"] = "Sala deletada com sucesso!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (SalaComReservaExistenteException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                TempData["Error"] = $"Erro ao tentar deletar uma sala: {ex.Message}";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Ocorreu um erro ao tentar deletar a sala. {ex.Message}";
+                return RedirectToAction(nameof(Index));
+            }
         }
 
 

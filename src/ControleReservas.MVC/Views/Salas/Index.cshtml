@@ -1,0 +1,76 @@
+﻿@model IEnumerable<ControleReservas.MVC.Models.SalaViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Salas</h2>
+
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<p>
+    <a class="btn btn-primary" asp-action="Criar">Criar Sala</a>
+</p>
+<table class="table" id="tabelaSalas" >
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Nome)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Capacidade)
+            </th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Nome)
+            </td>
+            <td class="text-center">
+                @Html.DisplayFor(modelItem => item.Capacidade)
+            </td>
+            <td>
+                @Html.ActionLink("Editar", "Editar", new { id = item.Id }, new { @class = "btn btn-warning btn-sm" }) |
+                @Html.ActionLink("Deletar", "Remover", new { id = item.Id }, new { @class = "btn btn-danger btn-sm" })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script type="text/javascript" src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+
+
+    <script>
+        $(document).ready(function() {
+            $('#tabelaSalas').DataTable({
+                "language": {
+                    "url": "https://cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json"
+                },
+                columnDefs: [
+                    { className: "dt-center", targets: "_all" }
+                ]
+            });
+        });
+    </script>
+}

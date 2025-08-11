@@ -64,6 +64,7 @@ namespace ControleReservas.MVC.Controllers
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
+                TempData["Error"] = $"Erro ao tentar criar uma reserva: {ex.Message}";
                 ViewBag.Salas = await _salaApi.ObterSalasAsync();
                 ViewBag.Usuarios = await _usuarioApi.ObterUsuariosAsync();
                 return View(vm);
@@ -116,8 +117,6 @@ namespace ControleReservas.MVC.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
-
-
 
         public async Task<IActionResult> Cancelar(Guid id)
         {

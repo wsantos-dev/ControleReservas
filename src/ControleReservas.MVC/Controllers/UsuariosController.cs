@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ControleReservas.MVC.Controllers
 {
-    public class UsuarioController : Controller
+    public class UsuariosController : Controller
     {
         private IUsuarioApiService _usuarioApi;
 
-        public UsuarioController(IUsuarioApiService usuarioApiService)
+        public UsuariosController(IUsuarioApiService usuarioApiService)
         {
             _usuarioApi = usuarioApiService;
         }

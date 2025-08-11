@@ -8,7 +8,7 @@
 
 <form asp-action="Editar" asp-route-id="@Model.Id" method="post">
     <div class="form-group">
-        <label asp-for="SalaId" class="control-label"></label>
+        <label asp-for="SalaId" class="control-label">Sala</label>
         <select asp-for="SalaId" class="form-control" asp-items="@(new SelectList(ViewBag.Salas, "Id", "Nome"))">
             <option value="">-- Selecione uma sala --</option>
         </select>
@@ -16,7 +16,7 @@
     </div>
 
     <div class="form-group">
-        <label asp-for="UsuarioId" class="control-label"></label>
+        <label asp-for="UsuarioId" class="control-label">Usuário</label>
         <select asp-for="UsuarioId" class="form-control" asp-items="@(new SelectList(ViewBag.Usuarios, "Id", "Nome"))">
             <option value="">-- Selecione um usuário --</option>
         </select>
@@ -24,13 +24,13 @@
     </div>
 
     <div class="form-group">
-        <label asp-for="DataHoraInicio" class="control-label"></label>
+        <label asp-for="DataHoraInicio" class="control-label">Data de Início</label>
         <input asp-for="DataHoraInicio" class="form-control" type="datetime-local" />
         <span asp-validation-for="DataHoraInicio" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="DataHoraFim" class="control-label"></label>
+        <label asp-for="DataHoraFim" class="control-label">Data Final</label>
         <input asp-for="DataHoraFim" class="form-control" type="datetime-local" />
         <span asp-validation-for="DataHoraFim" class="text-danger"></span>
     </div>
