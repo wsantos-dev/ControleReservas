@@ -2,7 +2,8 @@
 
 ## Visão Geral
 
-Este projeto é uma Fullstack desenvolvida com uma WebAPI **ASP.NET Core 9.0** no backend, e **ASP.NET Core MVC** no frontend. A API implementa operações para criar, editar e cancelar uma Reserva conforme regras de negócio que serão exibidas abaixo.
+Este projeto é uma aplicação Fullstack desenvolvida com uma WebAPI **ASP.NET Core 9.0** no backend, e **ASP.NET Core MVC** no frontend. 
+A API implementa operações para criar, editar e cancelar uma Reserva conforme regras de negócio que serão exibidas abaixo.
 
 ---
 
