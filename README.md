@@ -152,7 +152,10 @@ ControleReservas.sln
 
 ### Pré-requisitos
 
-- .NET 9 SDK instalado
+- .NET 9 SDK instalado. Caso não tenha instalado, realize o download e siga as instruções instalação por meio do link abaixo:
+  ```bash
+     https://dotnet.microsoft.com/pt-br/download/dotnet/9.0
+  ```
   
 - Banco de dados SQL Server: Segue abaixo o link para download:
 
@@ -184,7 +187,7 @@ https://learn.microsoft.com/pt-br/ssms/quickstarts/ssms-connect-query-sql-server
   ```html
       https://learn.microsoft.com/pt-br/sql/relational-databases/backup-restore/quickstart-backup-restore-database?view=sql-server-ver17&tabs=ssms
   ```
-Obs: A necessidade de usar o backup do banco de dados, é que não ele possui uma tabela com informações como credenciais para acesso a API de envio de e-mail. 
+Obs: A necessidade de usar o backup do banco de dados, é que ele possui uma tabela que contém informações credenciais para acesso a API de envio de e-mail. 
 Sem isso, o serviço de e-mail não funcionará. Também não foi possível armazenar essa informação no código para ser executadas as migrations, porquê a chave seria excluída do meu perfil do SendGrid por motivos de segurança.
 
 - Uma vez, que o SQL Server estiver instalado e configurado conforme instruções acima na sua máquina local, abra um documento .sql no caminho (Arquivo -> Nova Consulta) ou (File -> New Query) e execute o script T-SQL abaixo para criar o usuário do banco de dados. 
