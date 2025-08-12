@@ -1,0 +1,46 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      SA_PASSWORD: "DotNet@2025"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - controle-reservas-db:/var/opt/mssql
+
+  rest:
+    build:
+      context: .
+      dockerfile: ./src/ControleReservas.API/Dockerfile
+    depends_on:
+      - sqlserver
+    environment:
+      ASPNETCORE_URLS: "http://+:80"
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ConnectionStrings__ControleReservasConnection: "Server=sqlserver;Database=ControleReservas;User Id=sa;Password=DotNet@2025;TrustServerCertificate=True;"
+    ports:
+      - "5089:80"
+
+  mvc:
+    build:
+      context: .
+      dockerfile: ./src/ControleReservas.MVC/Dockerfile
+    depends_on:
+      - rest
+    environment:
+      ASPNETCORE_URLS: "http://+:80"
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ApiSettings__BaseUrl: "http://rest/api"
+    ports:
+      - "7149:80"
+
+volumes:
+  controle-reservas-db:
+    external: true
+
+networks:
+  dev_network:
+    external: true
+ 
