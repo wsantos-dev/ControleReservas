@@ -3,7 +3,12 @@
 ## Visão Geral
 
 Este projeto é uma aplicação Fullstack desenvolvida com uma WebAPI **ASP.NET Core 9.0** no backend, e **ASP.NET Core MVC** no frontend. 
-A aplicação implementa operações para criar, editar e cancelar uma Reserva conforme regras de negócio que serão exibidas abaixo.
+
+**Domínio**:
+
+Um empresa de coworking deseja um sistema para gerenciar as reservas de suas salas de reunião.  
+
+Deve ser possível, criar, editar e cancelar reservas, conforme regras de negócio que serão exibidas abaixo.
 
 ---
 
@@ -17,7 +22,8 @@ A aplicação implementa operações para criar, editar e cancelar uma Reserva c
 - Injeção de Dependência nativa do ASP.NET Core
 - Banco de Dados: SQL Server
 - Swagger / OpenAPI para documentação
-- XUnit para Testes Unitários.
+- XUnit e Moq para Testes Unitários.
+- Docker
 ---
 
 ## Regras de negócio
@@ -148,104 +154,91 @@ ControleReservas.sln
 
 ```
 
-## Como Executar
 
 ### Pré-requisitos
 
-- .NET 9 SDK instalado. Caso não tenha instalado, realize o download e siga as instruções instalação por meio do link abaixo:
-  ```bash
-     https://dotnet.microsoft.com/pt-br/download/dotnet/9.0
-  ```
-  
-- Banco de dados SQL Server: Segue abaixo o link para download:
+Ter o git instaldo em sua máquina. (Para realizar o download acesse https://git-scm.com/downloads, e nele você encontrará informações sobre a instalação)
+
+Após ter o git instalado, instale o Docker Desktop conforme sua plataforma. Abaixo temos o link com o passo a passo da instalação. (Caso não tenha instalado em sua máquina):
+
+- **Windows:** https://docs.docker.com/desktop/setup/install/windows-install/
+- **Linux:** https://docs.docker.com/desktop/setup/install/linux/
+- **MacOS:** https://docs.docker.com/desktop/setup/install/mac-install/
+
+---
+
+## ⚙️ Configuração Inicial
+
+- Após o docker estar instalado e funcional em sua máquina, acesse um terminal de sua preferência e execute os comando abaixos na sequência:
+
+Crie uma rede para o docker:
 
 ```bash
-https://www.microsoft.com/pt-br/sql-server/sql-server-downloads
+docker network create dev_network
 ```
 
-- Siga o guia de instalação do SQL Server 2022:
+Crie o volume para o SQL Server 2022:
+```bash
+docker volume create controle-reservas-db
+```
+
+Crie o container do SQL Server 2022:
+> ⚠️ Para Linux/MacOS substitua os acentos graves (\`) por barras invertidas (`\`)
+
+```powershell
+docker run `
+  -e "ACCEPT_EULA=Y" `
+  -e "SA_PASSWORD=DotNet@2025" `
+  -e "MSSQL_PID=Express" `
+  -p 1433:1433 `
+  --name container-sqlserver `
+  --network dev_network `
+  -v controle-reservas-db:/var/opt/mssql `
+  -d mcr.microsoft.com/mssql/server:2022-latest
+```
+
+Clone o repositório num diretório raiz de sua preferência:
 
 ```bash
-https://learn.microsoft.com/pt-br/sql/database-engine/install-windows/install-sql-server?view=sql-server-ver17   
+https://github.com/wsantos-dev/Desafio-FSBR.git
 ```
 
-- Instale um aplicativo para gerenciar o banco de dados ControleReservas. Como sugestão, indico o SQL Server Management Studio. Segue abaixo os links para download e configurações.
-
+Se usar SSH:
 ```bash
-https://learn.microsoft.com/pt-br/ssms/install/install
+git@github.com:wsantos-dev/Desafio-FSBR.git
 ```
 
-- Em relação a dúvidas sobre como conectar e realizar consultas, siga o link abaixo:
-
-```bash
-https://learn.microsoft.com/pt-br/ssms/quickstarts/ssms-connect-query-sql-server?view=sql-server-ver16&tabs=modern
-```
-
-
-- Realize a restauração do banco de dados **ControleReservas.bak**, incluído na raiz do projeto.
-- Você pode encontrar instruções para restauração de um banco de dados SQL Server no link abaixo:
-  ```html
-      https://learn.microsoft.com/pt-br/sql/relational-databases/backup-restore/quickstart-backup-restore-database?view=sql-server-ver17&tabs=ssms
-  ```
-Obs: A necessidade de usar o backup do banco de dados, é que ele possui uma tabela que contém informações credenciais para acesso a API de envio de e-mail. 
-Sem isso, o serviço de e-mail não funcionará. Também não foi possível armazenar essa informação no código para ser executadas as migrations, porquê a chave seria excluída do meu perfil do SendGrid por motivos de segurança.
-
-- Uma vez, que o SQL Server estiver instalado e configurado conforme instruções acima na sua máquina local, abra um documento .sql no caminho (Arquivo -> Nova Consulta) ou (File -> New Query) e execute o script T-SQL abaixo para criar o usuário do banco de dados. 
-
-- Usuário: desenvolvedor | Senha: DotNet@2025 conforme abaixo:
-- 
-  
-     ```tsql
-       USE ControleReservas
-       GO
-        -- Cria o login no servidor
-      CREATE LOGIN [desenvolvedor] WITH PASSWORD = N'DotNet@2025';
-      GO
-      
-      -- Adiciona o login à role 'sysadmin' para conceder permissões totais
-      ALTER SERVER ROLE [sysadmin] ADD MEMBER [desenvolvedor];
-      GO
-     ```
-    
-### Próximos passos
-
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/seu-usuario/seu-repositorio.git
-
-2. Verifique o arquivo appsettings.json do do projeto ControleReservas.API e modifique a string de conexão conforme
-   o seu ambiente:
-
-```bash
-    "ControleReservasConnection": "Server=localhost\\SQLEXPRESS;Database=ControleReservas;User Id=desenvolvedor;Password=DotNet@2025;TrustServerCertificate=True;"
-```
-
-
-3. Navege até o diretório:
+Navege até o diretório:
 ```bash
 cd Desafio-FSBR
-   ```
-3. Execute o comando abaixo:
-```bash
- dotnet build
 ```
-4. Uma vez compilado com sucesso, navege até o diretório ControleReservas.API e execute o comando:
+
+Crie a pasta de backup no container (se ainda não tiver)
 ```bash
-  dotnet run
+docker exec -it container-sqlserver mkdir /var/opt/mssql/backup
 ```
-5. Para acessar a API com o Swagger digite em seu navegador:
+
+Copie o arquivo .bak (Que está na raiz do projeto) do host para dentro do container:
+```bash
+docker cp ControleReservas.bak container-sqlserver:/var/opt/mssql/backup/ControleReservas.bak    
+```
+
+## Próximos passos
+
+
+1. Execute o comando abaixo (Aguarde a construção da imagem e do contâiner):
+```bash
+ docker-compose up --build
+```
+2. Após o comando acima executar com sucesso, você pode acessar a Web API com o Swagger, digite em seu navegador:
 ```bash
    http://localhost:5089/swagger/index.html
 ```
-6. Abra outro terminal e navegue até o diretório ControleReservas.MVC e execute o comando:
-```bash
-  dotnet run
-```
-7. Para acessar a aplicação digite em seu navegador:
+3. Para acessar a aplicação MVC digite em seu navegador:
 ```bash
   http://localhost:7149
 ```
-8. Para rodar os testes unitários, siga essas instruções:
+4. Para rodar os testes unitários, siga essas instruções:
 
     No Visual Studio:
     Vá em Test > Test Explorer.
