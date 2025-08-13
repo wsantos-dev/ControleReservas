@@ -200,12 +200,12 @@ docker run `
 Clone o repositório num diretório raiz de sua preferência:
 
 ```bash
-https://github.com/wsantos-dev/Desafio-FSBR.git
+git clone https://github.com/wsantos-dev/Desafio-FSBR.git
 ```
 
 Se usar SSH:
 ```bash
-git@github.com:wsantos-dev/Desafio-FSBR.git
+git clone git@github.com:wsantos-dev/Desafio-FSBR.git
 ```
 
 Navege até o diretório:
